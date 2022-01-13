@@ -1,4 +1,3 @@
-load("/Users/Muscardin/Documents/Analyses/Post-zygotic mechanisms/RNAseq/hybridsmiRNAseq/hybridsmiRNAseq/miRNA-de.RData")
 library(tidyr)
 library("DESeq2")
 library("tximport")
@@ -14,18 +13,18 @@ library(MCMCglmm)
 
 # Get miRNA count matrix
 
-d.raw<-read.table("/Users/Muscardin/Documents/Analyses/Post-zygotic mechanisms/RNAseq/hybridsmiRNAseq/quentin/mirna-counts-for-analyses.txt", h=T)
-d.samples<-read.table("/Users/Muscardin/Documents/Analyses/Post-zygotic mechanisms/RNAseq/hybridsmiRNAseq/quentin/config.txt")
+d.raw<-read.table("/mirna-counts-for-analyses.txt", h=T)
+d.samples<-read.table("/config.txt") # import the config file written for MirDeep2
 
 d.samples<-separate(d.samples,col = "V1", into = c(NA,"V1"),sep = "d/") %>% separate(col = "V1", into = c("V1",NA),sep = "_S")
 d.samples<-d.samples[order(d.samples$V2),]
 colnames(d.raw[,5:76])<-d.samples$V1
 
 ### List of nonredundant miRNAs (from CD-hit EST output)
-uniq.prec <- read.table("~/Documents/Analyses/Post-zygotic mechanisms/RNAseq/mRNA/miRNA-target/nonredundant.miRNA.names.txt")
+uniq.prec <- read.table("~/nonredundant.miRNA.names.txt")
 uniq.prec <- as.data.frame(uniq.prec) %>% separate(col = "V1", into = c(NA, "miRNA"), sep = 1)
 uniq.mature <- merge(d.raw[,c(1,3)],uniq.prec, by.x = "precursor", by.y="miRNA", all.x = F )
-saveRDS(uniq.mature, "~/Documents/Analyses/Post-zygotic mechanisms/RNAseq/mRNA/miRNA-target/uniq.mature.RDS")
+saveRDS(uniq.mature, "~/uniq.mature.RDS")
 
 # dataframe filtered from redundant sequences identified with CD-hit
 d.raw.filt <- d.raw[d.raw$precursor %in% uniq.mature$precursor,]
@@ -36,7 +35,7 @@ rownames(dfde)<-make.unique(rownames(dfde))
 colnames(dfde)<-d.samples$V1
 
 # Get sample info 
-df.info<-read.csv("/Users/Muscardin/Documents/Analyses/Post-zygotic mechanisms/RNAseq/hybridsmiRNAseq/hybridsmiRNAseq/dataInfo/hybridsCharrDataFrameDagny.csv",h=T, sep = ";")
+df.info<-read.csv("/hybridsCharrDataFrameDagny.csv",h=T, sep = ";")
 df.info$Sample<-sub("_..._","-",df.info$Sample)
 df.info$Batch<-as.factor(df.info$Batch)
 df.info$Timepoint<-as.factor(df.info$Timepoint)
@@ -224,23 +223,7 @@ assays(dds)[["Cooks"]]
 par(mar=c(8,5,2,2))
 boxplot(log10(assays(dds)[["cooks"]]), range=0, las=2)
 
-
-# ##### DE without Batch 3
-# ds_de3<-DESeq(dds3)
-# resultsNames(ds_de3)
-# # 150ts
-# r.pl.sb.150.2 <- results(ds_de3,contrast =  c("group","SBxSB_150","PLxPL_150"))
-# r.plsb.plpl.150.2 <- results(ds_de3,contrast =  c("group","PLxSB_150","PLxPL_150"))
-# r.sbpl.plpl.150.2 <- results(ds_de3,contrast =  c("group","SBxPL_150","PLxPL_150"))
-# r.plsb.sbsb.150.2 <- results(ds_de3,contrast =  c("group","PLxSB_150","SBxSB_150"))
-# r.sbpl.sbsb.150.2 <- results(ds_de3,contrast =  c("group","SBxPL_150","SBxSB_150"))
-# 
-# # 200ts
-# r.pl.sb.200.2  <- results(ds_de3,contrast =  c("group","SBxSB_200","PLxPL_200"))
-# r.plsb.plpl.200.2  <- results(ds_de3,contrast =  c("group","PLxSB_200","PLxPL_200"))
-# r.sbpl.plpl.200.2  <- results(ds_de3,contrast =  c("group","SBxPL_200","PLxPL_200"))
-# r.plsb.sbsb.200.2  <- results(ds_de3,contrast =  c("group","PLxSB_200","SBxSB_200"))
-# r.sbpl.sbsb.200.2  <- results(ds_de3,contrast =  c("group","SBxPL_200","SBxSB_200"))
+######## 200ts
 
 # Apply shrinkage
 dds3$group<-relevel(dds3$group,"SBxSB_200")
@@ -363,22 +346,7 @@ plotmR34 <- ggplot(p.miR34[p.miR34$Age == 150,], aes(x=Cross, y=corrected, fill 
   theme_bw() +
   theme(legend.position = "none")
 
-# ###### With SE
-# sl <- ddply(p.miR34, c("Cross", "Age"), summarise,
-#             N    = length(log.count),
-#             mean = mean(log.count,na.rm = T),
-#             sd   = sd(log.count,na.rm = T),
-#             se   = sd / sqrt(N)
-# )
-# pd <- position_dodge(0.1)
-# ggplot(sl, aes(x=Age, y=mean, colour= Cross,group = Cross)) + 
-#   geom_errorbar(aes(ymin=mean-se, ymax=mean+se), colour="black",width=.1, position=pd) +
-#   geom_line(position=pd) +
-#   geom_point(position=pd,size = 2) + theme_bw() + theme(panel.grid.major = element_blank(),
-#                                                         panel.grid.minor = element_blank()) +
-#   labs(title="miR-34") + ylab("Mean log(count)") +
-#   scale_color_manual(values = c("darkgreen","lightgreen","lightblue","blue"))+ 
-#   xlab("Relative age")
+
 
 
 #miR-100
@@ -523,7 +491,7 @@ write.table(dge$samples[1], "~/Desktop/samples-group.txt", sep = " " )
 
 # LCV
 
-lcv<-read.table("~/Documents/Analyses/Post-zygotic mechanisms/RNAseq/LCV-master/gene_noise_github500_all_genes.csv", sep = ",", h = T)
+lcv<-read.table("~/gene_noise_github500_all_genes.csv", sep = ",", h = T) # LCV output from the adapted script of Simonovsky et al., (2019) https://github.com/eyalsim/LCV
 par(mfrow = c(2,2))
 hist(lcv$SBxSB_150, main = "a. SBxSB 150ts" , xlab = "LCV", col = "lightblue")
 hist(lcv$PLxPL_150, main = "c. PLxPL 150ts", xlab = "LCV", col = "lightblue")
@@ -575,7 +543,7 @@ df.c4<-as.data.frame(df.c4)
 df.c4$Group<-as.factor(df.c4$Group)
 df.c4$mature<-as.factor(df.c4$mature)
 
-write.csv(df.c4, "/Users/Muscardin/Documents/Analyses/Post-zygotic mechanisms/RNAseq/hybridsmiRNAseq/quentin/results/LCV/cluster4.csv")
+write.csv(df.c4, "/cluster4.csv")
 
 
 #### Group differences in c4 with MCMCglmm
@@ -639,7 +607,7 @@ for(i in 1:10){
 
 for(i in 1:10) {
   write.table(clist[[i]]$gene[!duplicated(clist[[i]]$gene)],
-              paste("~/Documents/Analyses/Post-zygotic mechanisms/RNAseq/",i,".txt",sep =""))
+              paste("~/",i,".txt",sep =""))
 }
 
 # Plot LCV posterior modes and 95% CrIs
@@ -718,4 +686,4 @@ ggplot(cv.de2[cv.de2$age == 200,],
 saveRDS(data.frame(sh.pl.sb.200[complete.cases(sh.pl.sb.200$padj) ,
                                     c("log2FoldChange","padj")],
            miRNA.names = rownames(sh.pl.sb.200[complete.cases(sh.pl.sb.200$padj) ,])),
-        "~/Desktop/miRNA-foldchange.rds")
+        "~/miRNA-foldchange.rds")
