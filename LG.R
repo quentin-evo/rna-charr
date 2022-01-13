@@ -4,16 +4,16 @@ library(chromoMap)
 
 
 ##### Annotation object
-tx.genome <- makeTxDbFromGFF("~/Desktop/GCF_002910315.2_ASM291031v2_genomic.gff", format = "gff")
+tx.genome <- makeTxDbFromGFF("~/GCF_002910315.2_ASM291031v2_genomic.gff", format = "gff") # from the Salvelinus genome assembly ASM291031v2
 key1 <-rownames(dds)[1:10]
 
 columns(tx.genome)
 
-# De genes
+# DE genes from the DEseq objects created in the DE.R script
 DE.lg <- AnnotationDbi::select(tx.genome, keys = rownames(na.omit(sh.pl.sb.200)[na.omit(sh.pl.sb.200$padj) < 0.1,]), columns= c("TXCHROM","TXSTART", "TXEND"), 
                       keytype="GENEID")
 # Sequences alias
-seqalias <- read.table("~/Documents/Analyses/Post-zygotic mechanisms/RNAseq/mRNA/DE-analyses/LG/GCF_002910315.2.chromAlias.txt",h =T)
+seqalias <- read.table("~/GCF_002910315.2.chromAlias.txt",h =T)
 DE.lg <- DE.lg[DE.lg$TXCHROM %in% seqalias$alias, ]
 DE.lg <- merge(DE.lg, seqalias[, c(1,4)], by.x = "TXCHROM", by.y = "alias")
 DE.lg <- data.frame(DE.lg$GENEID, DE.lg$sequenceName, DE.lg$TXSTART, DE.lg$TXEND)
@@ -24,7 +24,7 @@ DE.lg[DE.lg[,1] %in% rownames(dfcontr[dfcontr$inheritance200  %in% "PLdominant",
 DE.lg[DE.lg[,1] %in% rownames(dfcontr[dfcontr$inheritance200  %in% "Maternal",]),5] <- "Maternal"
 
 ###### Chromosome object 
-chrom <- read.table("~/Documents/Analyses/Post-zygotic mechanisms/RNAseq/mRNA/DE-analyses/LG/GCF_002910315.2.chrom.sizes.txt",h =T)
+chrom <- read.table("~/GCF_002910315.2.chrom.sizes.txt",h =T)
 chrom <- data.frame(chrom$chrLG4q_1_29, rep(1,nrow(chrom)),chrom$X90519428)
 chrom <- chrom[chrom$chrom.chrLG4q_1_29 %in% DE.lg[,2],]
 colnames(chrom) <- NULL
