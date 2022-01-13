@@ -1,6 +1,10 @@
 # rna-charr
 
+DE.R : R script for differential expression analyses of mRNA
+
 GOscript.R : R script for Gene Onthology analyses
+
+LG.R :  script for identifying the physical location of genes of interest on the charr genome
 
 Phenotype.R : R script for analyses on the jaw lever system
 
