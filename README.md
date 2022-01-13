@@ -1,6 +1,6 @@
 # rna-charr
 
-DE.R : R script for differential expression analyses of mRNA
+DE.R : R script for differential expression analyses of mRNAs
 
 GOscript.R : R script for Gene Onthology analyses
 
