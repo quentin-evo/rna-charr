@@ -14,7 +14,7 @@ gene_noise_github500_all_genes.csv : output of LCV algorithm, from modified scri
 
 hybridsCharrDataFrameDagny.csv : total rna samples metadata
 
-miRNA-de.R : R script for mRNA differential expression analysis
+miRNA-de.R : R script for miRNA differential expression analysis
 
 nonredundant.miRNA.names.txt : output from CD-IT EST
 
