@@ -1,0 +1,43 @@
+{\rtf1\ansi\ansicpg1252\cocoartf1671\cocoasubrtf600
+{\fonttbl\f0\fswiss\fcharset0 Helvetica;\f1\fnil\fcharset0 Monaco;}
+{\colortbl;\red255\green255\blue255;\red0\green0\blue0;\red0\green0\blue0;\red255\green255\blue255;
+\red242\green242\blue242;\red0\green0\blue0;}
+{\*\expandedcolortbl;;\csgray\c0;\cssrgb\c0\c1\c1;\cssrgb\c100000\c100000\c100000\c0;
+\csgray\c95825;\csgray\c0\c85000;}
+\paperw11900\paperh16840\margl1440\margr1440\vieww21140\viewh15080\viewkind0
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+
+\f0\fs28 \cf0 # Fastqc of trimmed sequences\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
+\cf2 \CocoaLigature0 fastqc ./ hybridsmiRNAseq/drosophila/output/cutadaptTrimmed/*gz -o ./output_quentin/\
+\
+ multiqc ./output_quentin/\
+\
+# index reference file\
+bowtie-build ./quent/microrna/ref/mirBase.matureUtoTRepRemov.fa ./quent/microrna/ref/mirBase.matureUtoTRepRemov.fa\
+\
+# fasta.gz need to be unzip\
+\
+# Preprocess and Map reads to \'93charr\'94 genome\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
+\cf3 \cb4 mapper.pl ./quent/microrna/config.txt -d -e -h -i -j -m -p ./quent/microrna/charr_genome.fna.gz -s ./quent/microrna/read_collapsed.fa -t ./quent/microrna/reads_vs_charr_genome.arf -v -o 32\
+\
+# Quantify expression\
+\
+quantifier.pl -p ./quent/microrna/ref/hairpin.fa -m ./quent/microrna/ref/mature.fa -r ./quent/microrna/read_collapsed.fa  -c ./quent/microrna/config.txt \
+\
+\
+\
+\
+\
+\
+############### For desk mac\
+quantifier.pl -p 
+\f1\fs36 \cf5 \cb6 ../../ref/hairpin.fa
+\f0\fs28 \cf3 \cb4  -m .
+\f1\fs36 \cf5 \cb6 ../../ref/mature.fa
+\f0\fs28 \cf3 \cb4  -r 
+\f1\fs36 \cf5 \cb6 ../../read_collapsed.fa
+\f0\fs28 \cf3 \cb4   -c 
+\f1\fs36 \cf5 \cb6 ../../
+\f0\fs28 \cf3 \cb4 config.txt }
