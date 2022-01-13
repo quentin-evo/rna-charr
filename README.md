@@ -10,7 +10,7 @@ STAR-align-script.rtf : mRNA sequencing data pre-processing and read alignment
 
 config.txt : config file for miRDeep2
 
-gene_noise_github500_all_genes.csv : output of LCV algorithm, from modified script from Simonovsky et al, (2019) https://github.com/eyalsim/LCV
+gene_noise_github500_all_genes.csv : output of LCV algorithm, from modified script from Simonovsky et al. (2019) https://github.com/eyalsim/LCV
 
 hybridsCharrDataFrameDagny.csv : total rna samples metadata
 
