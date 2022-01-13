@@ -3,15 +3,13 @@ library(ggplot2)
 library(MCMCglmm)
 library(tidybayes)
 library(gridExtra)
-load("~/Documents/Analyses/Post-zygotic mechanisms/RNAseq/mRNA/DE-analyses/Phenotype/Phenotype.Rdata")
 
-d1 <- read.csv("~/Documents/Analyses/Post-zygotic mechanisms/RNAseq/mRNA/DE-analyses/Phenotype/RA-phenotype-r1.csv")
-d2 <- read.csv("~/Documents/Analyses/Post-zygotic mechanisms/RNAseq/mRNA/DE-analyses/Phenotype/RA-phenotype-r2.csv")
+d1 <- read.csv("~/RA-phenotype-r1.csv")
+d2 <- read.csv("~/RA-phenotype-r2.csv")
 d1 <- rbind(d1,d2)
 
 d1 <- d1[, c("Label","Length","Angle")]
 d1$Label <- as.factor(d1$Label)
-# d1$Label <- as.numeric(d1$Length)
 
 d1$Measure <- rep(c("Articular","Dentary"),nrow(d1)/2)
 
@@ -31,12 +29,13 @@ d1 <- separate(d1, fam, into = c(NA, "fam",NA), c(2,8))
 d1$fam.short <- d1$ind 
 d1 <- separate(d1, fam.short, into = c(NA, "fam.short",NA), c(6,8))
 
-d3 <- read.table("~/Documents/Analyses/Post-zygotic mechanisms/RNAseq/mRNA/DE-analyses/Phenotype/LiekePonsioen_sizes.txt",h=T,numerals = "no.loss")
+d3 <- read.table("~/LiekePonsioen_sizes.txt",h=T,numerals = "no.loss") # Dataset of fork length sizes
 d3$ind <- paste(d3$Family, formatC(d3$name, width=3, flag="0"), sep="_")
 d1<- merge(d1,d3[, c("ind","Length")], by = "ind",all.x = T)
 d1$alpha <- 180-(d1$Angle - 90)-90
 d1$sin.alpha <- sin(d1$alpha)
-############# Ratio #############
+
+############# Articular/Dentary ratio #############
 
 ### Boxplot
 ggplot(d1, aes(x=Cross, y=Ratio, fill = Cross)) +
@@ -61,7 +60,7 @@ ggplot(d1, aes(x=Length, y=Ratio, color = Cross)) +
         axis.text.x = element_text(angle = 90),
         axis.text = element_text(size = 14))
 
-############# Angle #############
+############# Articular,Dentary Angle #############
 
 ggplot(d1, aes(x=Cross, y=Angle, fill = Cross)) +
   geom_boxplot() + 
@@ -74,7 +73,7 @@ ggplot(d1, aes(x=Cross, y=Angle, fill = Cross)) +
         axis.text.x = element_text(angle = 90),
         axis.text = element_text(size = 14))
 
-######## Model 
+######## Linear Model 
 
 prior1<-list(G=list(
   G1=list(V=1,nu=0.002)),R=list(V=diag(3),n=1))
@@ -89,7 +88,7 @@ m.angle1<-MCMCglmm(alpha~Cross - 1,
                    rcov = ~idh(Cross):units, data = d1,verbose = T,
                    nitt = 13000*iter,thin = 10*iter, burnin = 3000*iter)
 
-## MA
+## Mechanc Advantage
 
 ### Fixed effects 
 
