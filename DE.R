@@ -11,10 +11,8 @@ library(circlize)
 library(MCMCglmm)
 library(gridExtra)
 
-load("~/Documents/Analyses/Post-zygotic mechanisms/RNAseq/mRNA/DE-analyses/DE-mRNA.RData")
-
 # Import read count
-mdf<-read.table("~/Documents/Analyses/Post-zygotic mechanisms/RNAseq/mimir-saved/mrna_featureCounts.txt",h=T,skip = 1)
+mdf<-read.table("~/mrna_featureCounts.txt",h=T,skip = 1) # import read counts
 rownames(mdf) <- mdf$Geneid
 mdf<-mdf[,-c(1,2,3,4,5,6)] # Remove Chr, strand info, lengths
 colnames(mdf) <- gsub('X.home.qjb1.rnaseq.STAR.AlignedSortedBAM.', '', colnames(mdf))
@@ -22,7 +20,7 @@ colnames(mdf) <- gsub('.STAR.alignedAligned.sortedByCoord.out.bam', '', colnames
 colnames(mdf) <- gsub('[.]', '_', colnames(mdf))
 
 # Import metadata
-df.info<-read.csv("/Users/Muscardin/Documents/Analyses/Post-zygotic mechanisms/RNAseq/hybridsmiRNAseq/hybridsmiRNAseq/dataInfo/hybridsCharrDataFrameDagny.csv",h=T, sep = ";")
+df.info<-read.csv("/hybridsCharrDataFrameDagny.csv",h=T, sep = ";")
 df.info$Batch<-as.factor(df.info$Batch)
 df.info$Timepoint<-as.factor(df.info$Timepoint)
 row.names(df.info)<-df.info$Sample
@@ -75,8 +73,6 @@ pheatmap(assay(vsd), cluster_rows=T, show_rownames=FALSE,
          cluster_cols=T, annotation_col=hdf ,
          annotation_colors = ann_colors
 ) 
-# 149_200_C mixed up with the 150ts samples. In the PCA, it has coordinates: 2.564065 ; -19.8883017
-
 
 # DE analysis
 ds_de<-DESeq(dds)
@@ -193,7 +189,7 @@ chiPL200 <- chisq.test(contPLPL)
 
 contPLPL[1,1] <- sum(sh.pl.sb.150$padj < 0.1,na.rm = T)/sum(sh.pl.sb.150$baseMean > 0,na.rm = T)
 
-#### Inheritance patterns 
+#### Dominance patterns 
 
 inh <- function(df) {
   dfcontr <- as.data.frame(df)
@@ -322,10 +318,6 @@ inh <- function(df) {
   ] <-"NoDE"
 
 ############### 200ts
-
-#dfcontr$inheritance200 <- rep(NA,nrow(dfcontr))
-
-#is.na(dfcontr[ ,c("sh.pl.sb.200.padj","sh.plsb.sbsb.200.padj", "sh.sbpl.sbsb.200.padj","sh.plsb.plpl.200.padj","sh.sbpl.plpl.200.padj")]) <- 1
 
 # Maternal
 dfcontr$inheritance200[dfcontr$sh.pl.sb.200.padj < 0.1
@@ -490,7 +482,7 @@ rownames(rbind(sh.pl.sb.200[rownames(dfcontr[complete.cases(dfcontr$inheritance2
       sh.pl.sb.200[rownames(dfcontr[complete.cases(dfcontr$inheritance200) &
                                       dfcontr$inheritance200 == "Maternal" & dfcontr$sh.pl.sb.200.log2FoldChange < -1,]),]))
 
-write("~/Desktop/Go-analysis/maternal200.txt",x = rownames(sel))
+write("~/maternal200.txt",x = rownames(sel))
 
 
 ####### Select PL-dominant genes
@@ -505,7 +497,7 @@ rownames(rbind(sh.pl.sb.200[rownames(dfcontr[complete.cases(dfcontr$inheritance2
                                                dfcontr$inheritance200 == "PLdominant" & dfcontr$sh.pl.sb.200.log2FoldChange > 1,]),],
                sh.pl.sb.200[rownames(dfcontr[complete.cases(dfcontr$inheritance200) &
                                                dfcontr$inheritance200 == "PLdominant" & dfcontr$sh.pl.sb.200.log2FoldChange < -1,]),]))
-write("~/Desktop/Go-analysis/pldominant200.txt",x = rownames(selpl))
+write("~/pldominant200.txt",x = rownames(selpl))
 
 
 
@@ -528,11 +520,11 @@ dge <- dge[keep2, , keep.lib.sizes=FALSE]
 dge <- calcNormFactors(dge)
 tmm <- cpm(dge)
 
-write.table(x = tmm, "~/Desktop/mRNA-table-normalized-counts-charr.txt",sep = " ")
-write.table(dge$samples[1], "~/Desktop/mRNA-samples-group.txt", sep = " " )
+write.table(x = tmm, "~/mRNA-table-normalized-counts-charr.txt",sep = " ")
+write.table(dge$samples[1], "~/mRNA-samples-group.txt", sep = " " )
 
 # Compare LCV distributions
-lcv<-read.table("~/Documents/Analyses/Post-zygotic mechanisms/RNAseq/mRNA/LCV/gene_noise_github500_all_genes.csv", sep = ",", h = T)
+lcv<-read.table("~/gene_noise_github500_all_genes.csv", sep = ",", h = T)
 par(mfrow = c(2,2))
 hist(lcv$SBxSB_150, main = "a. SBxSB 150ts" , xlab = "LCV")
 hist(lcv$PLxPL_150, main = "c. PLxPL 150ts", xlab = "LCV")
@@ -573,7 +565,7 @@ for(i in 1:10){
   df.c4$Group<-as.factor(df.c4$Group)
   df.c4$gene<-as.factor(df.c4$gene)
   clist[[i]]<- df.c4
-  write.csv(df.c4$gene, paste("~/Documents/Analyses/Post-zygotic mechanisms/RNAseq/mRNA/LCV/genes-cluster",i,".txt",sep=""))
+  write.csv(df.c4$gene, paste("~/genes-cluster",i,".txt",sep=""))
 }
 names(clist) <- 1:10
 
@@ -592,7 +584,7 @@ for(i in 1:10){
 
 for(i in 1:10) {
   write.table(sample(x = clist[[i]]$gene[!duplicated(clist[[i]]$gene)],200),
-                                 paste("~/Documents/Analyses/Post-zygotic mechanisms/RNAseq/mRNA/LCV/Results/LCV-genes-location/cluster",i,".txt",sep =""))
+                                 paste("~/cluster",i,".txt",sep =""))
   }  
 write.csv(as.data.frame(sample(x = clist[[1]]$gene[!duplicated(clist[[2]]$gene)],25))[,2],"~/Documents/.txt",sep ="")
 # Plot LCV posterior modes and 95% CrIs
@@ -618,23 +610,4 @@ ggplot(dfmc.p, aes(x=Group, y=pmode)) +
           title = element_text(size =7))
 
 
-
-#### Genes locations on linkage groups
-
-df.lg<-data.frame(rbind(read.table("~/Documents/Analyses/Post-zygotic mechanisms/RNAseq/mRNA/LCV/Results/LCV-genes-location/coordinates/ncbi-cluster1.tsv",h=T),
-                 read.table("~/Documents/Analyses/Post-zygotic mechanisms/RNAseq/mRNA/LCV/Results/LCV-genes-location/coordinates/ncbi-cluster2.tsv",h=T),
-read.table("~/Documents/Analyses/Post-zygotic mechanisms/RNAseq/mRNA/LCV/Results/LCV-genes-location/coordinates/ncbi-cluster3.tsv",h=T),
-read.table("~/Documents/Analyses/Post-zygotic mechanisms/RNAseq/mRNA/LCV/Results/LCV-genes-location/coordinates/ncbi-cluster4.tsv",h=T),
-read.table("~/Documents/Analyses/Post-zygotic mechanisms/RNAseq/mRNA/LCV/Results/LCV-genes-location/coordinates/ncbi-cluster5.tsv",h=T),
-read.table("~/Documents/Analyses/Post-zygotic mechanisms/RNAseq/mRNA/LCV/Results/LCV-genes-location/coordinates/ncbi-cluster6.tsv",h=T),
-read.table("~/Documents/Analyses/Post-zygotic mechanisms/RNAseq/mRNA/LCV/Results/LCV-genes-location/coordinates/ncbi-cluster7.tsv",h=T),
-read.table("~/Documents/Analyses/Post-zygotic mechanisms/RNAseq/mRNA/LCV/Results/LCV-genes-location/coordinates/ncbi-cluster8.tsv",h=T),
-read.table("~/Documents/Analyses/Post-zygotic mechanisms/RNAseq/mRNA/LCV/Results/LCV-genes-location/coordinates/ncbi-cluster9.tsv",h=T),
-read.table("~/Documents/Analyses/Post-zygotic mechanisms/RNAseq/mRNA/LCV/Results/LCV-genes-location/coordinates/ncbi-cluster10.tsv",h=T)),
-cluster = c(rep("Cluster1",nrow(dfmc[[1]])),rep("Cluster2",nrow(dfmc[[1]])),
-            rep("Cluster3",nrow(dfmc[[1]])),rep("Cluster4",nrow(dfmc[[1]])),
-            rep("Cluster5",nrow(dfmc[[1]])),rep("Cluster6",nrow(dfmc[[1]])),
-            rep("Cluster7",nrow(dfmc[[1]])),rep("Cluster8",nrow(dfmc[[1]])),
-            rep("Cluster9",nrow(dfmc[[1]])),rep("Cluster10",nrow(dfmc[[1]]))))
-plot(as.factor(df.lg$cluster),as.factor(df.lg$Chromosome))
 
