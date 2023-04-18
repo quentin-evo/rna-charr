@@ -1,5 +1,9 @@
 # rna-charr
 
+These are scripts and information on data preprocessing associated with the Paper "Evolution of canalization: lessons from a classic case of resource polymorphism"    
+
+## Scripts
+
 DE.R : R script for differential expression analyses of mRNAs
 
 GOscript.R : R script for Gene Onthology analyses
@@ -27,3 +31,7 @@ remove-redundant-miRNA.rtf : removing miRNA with high sequence similarity
 samples-group-charr.txt : metadata for LCV algorithm
 
 table-normalized-counts-charr.txt : read counts for LCV estimation algorithm
+
+## Data
+
+STAR-logfiles : Alignment log files
